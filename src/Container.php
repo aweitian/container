@@ -3,12 +3,12 @@
  * 2017/4/26 17:36:25
  * IOC容器
  */
-namespace tian;
+namespace Tian;
 use Closure;
 use ArrayAccess;
 use Exception;
 use ReflectionClass;
-class container implements \ArrayAccess
+class Container implements \ArrayAccess
 {
 	//绑定实例
 	public $bindings = [ ];

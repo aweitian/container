@@ -15,7 +15,7 @@ class ContainerTest extends PHPUnit_Framework_TestCase
     }
     public function testBind()
     {
-    	$app = new \tian\container();
+    	$app = new \Tian\Container();
     	$c = $app->bind('b', function($o) use ($app) {
     		$this->assertEquals($o, $app);
     		//这个地方不能用 return $app['b'];因为会递归解析这个B，没有退出条件
@@ -25,7 +25,7 @@ class ContainerTest extends PHPUnit_Framework_TestCase
     }
     public function testInstance()
     {
-    	$app = new \tian\container();
+    	$app = new \Tian\Container();
     	$c = $app->instance('gaga', 123);
     	$this->assertEquals(123, $c->make('gaga'));
     }
