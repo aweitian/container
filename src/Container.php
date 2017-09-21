@@ -28,6 +28,15 @@ class Container implements \ArrayAccess
 		return $this;
 	}
 
+    /**
+     * @param $name
+     * @return bool
+     */
+	public function bound($name)
+    {
+        return array_key_exists($name,$this->instances);
+    }
+
 	/**
 	 * 注册单例服务
 	 *
@@ -222,12 +231,4 @@ class Container implements \ArrayAccess
 	public function offsetUnset( $key ) {
 		unset( $this->bindings[ $key ], $this->instances[ $key ] );
 	}
-
-	public function __get( $key ) {
-		return $this[ $key ];
-	}
-
-	public function __set( $key, $value ) {
-		$this[ $key ] = $value;
-	}		
 }

@@ -25,9 +25,17 @@ class ContainerTest extends PHPUnit_Framework_TestCase
     }
     public function testInstance()
     {
-    	$app = new \Tian\Container();
+        $app = new \Tian\Container();
     	$c = $app->instance('gaga', 123);
     	$this->assertEquals(123, $c->make('gaga'));
+    }
+
+    public function testBound()
+    {
+        $app = new \Tian\Container();
+        $app->instance("b.d","ggfgg");
+        $this->assertTrue($app->bound("b.d"));
+        $this->assertFalse($app->bound("b.dd"));
     }
 }
 class a
