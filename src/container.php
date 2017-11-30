@@ -8,7 +8,7 @@ use Closure;
 use ArrayAccess;
 use Exception;
 use ReflectionClass;
-class Container implements \ArrayAccess
+class Container implements ArrayAccess
 {
 	//绑定实例
 	public $bindings = [ ];
@@ -18,10 +18,10 @@ class Container implements \ArrayAccess
 	/**
 	 * 服务绑定到容器
 	 *
-	 * @param $name 服务名
-	 * @param $closure 返回服务对象的闭包函数
+	 * @param string $name 服务名
+	 * @param closure $closure 返回服务对象的闭包函数
 	 * @param bool $force 是否单例
-	 * @return \tian\container
+	 * @return $this
 	 */
 	public function bind( $name, $closure, $force = false ) {
 		$this->bindings[ $name ] = compact( 'closure', 'force' );
@@ -40,8 +40,8 @@ class Container implements \ArrayAccess
 	/**
 	 * 注册单例服务
 	 *
-	 * @param $name 服务
-	 * @param $closure 闭包函数
+	 * @param string $name 服务
+	 * @param closure $closure 闭包函数
 	 * @return \tian\container
 	 */
 	public function single( $name, $closure ) {
@@ -61,15 +61,16 @@ class Container implements \ArrayAccess
 		return $this;
 	}
 
-	/**
-	 * 获取服务实例
-	 * 如果存在于instances中，直接返回instances中对象，没有利用反射NEW一个对象
-	 * 这中间涉及到构造函数的参数问题，现在处理方式使用默认值，如果没有默认值会抛出一个异常
-	 * @param $name 服务名
-	 * @param bool $force 单例
-	 *
-	 * @return mixed|object
-	 */
+    /**
+     * 获取服务实例
+     * 如果存在于instances中，直接返回instances中对象，没有利用反射NEW一个对象
+     * 这中间涉及到构造函数的参数问题，现在处理方式使用默认值，如果没有默认值会抛出一个异常
+     * @param string $name 服务名
+     * @param bool $force 单例
+     *
+     * @return mixed|object
+     * @throws Exception
+     */
 	public function make( $name, $force = false ) {
 		if ( isset( $this->instances[ $name ] ) ) {
 			return $this->instances[ $name ];
@@ -89,7 +90,7 @@ class Container implements \ArrayAccess
 	/**
 	 * 获得实例实现
 	 *
-	 * @param $name 创建实例方式:类名或闭包函数
+	 * @param string $name 创建实例方式:类名或闭包函数
 	 *
 	 * @return mixed
 	 */
@@ -97,13 +98,14 @@ class Container implements \ArrayAccess
 		return isset( $this->bindings[ $name ] ) ? $this->bindings[ $name ]['closure'] : $name;
 	}
 
-	/**
-	 * 依赖注入方式调用函数
-	 *
-	 * @param $function
-	 *
-	 * @return mixed
-	 */
+    /**
+     * 依赖注入方式调用函数
+     *
+     * @param $function
+     *
+     * @return mixed
+     * @throws Exception
+     */
 	public function callFunction( $function ) {
 		$reflectionFunction = new \ReflectionFunction( $function );
 		$args               = $this->getDependencies( $reflectionFunction->getParameters() );
@@ -111,14 +113,15 @@ class Container implements \ArrayAccess
 		return $reflectionFunction->invokeArgs( $args );
 	}
 
-	/**
-	 * 反射执行方法并实现依赖注入
-	 *
-	 * @param $class 类
-	 * @param $method 方法
-	 *
-	 * @return mixed
-	 */
+    /**
+     * 反射执行方法并实现依赖注入
+     *
+     * @param object $class 类
+     * @param string $method 方法
+     *
+     * @return mixed
+     * @throws Exception
+     */
 	public function callMethod( $class, $method ) {
 		//反射方法实例
 		$reflectionMethod = new \ReflectionMethod( $class, $method );
@@ -167,7 +170,7 @@ class Container implements \ArrayAccess
 	/**
 	 * 递归解析参数
 	 *
-	 * @param $parameters 
+	 * @param \ReflectionParameter[] $parameters
 	 * (new ReflectionClass( $className ))->getConstructor()->getParameters()
 	 * (new \ReflectionFunction( $function ))->getParameters()
 	 * (new \ReflectionMethod( $class, $method ))->getParameters()
@@ -196,7 +199,7 @@ class Container implements \ArrayAccess
 	/**
 	 * 提取参数默认值
 	 *
-	 * @param $parameter
+	 * @param \ReflectionParameter $parameter
 	 *
 	 * @return mixed
 	 * @throws Exception
@@ -214,6 +217,11 @@ class Container implements \ArrayAccess
 		return isset( $this->bindings[ $key ] );
 	}
 
+    /**
+     * @param mixed $key
+     * @return mixed|object
+     * @throws Exception
+     */
 	public function offsetGet( $key ) {
 		return $this->make( $key );
 	}
