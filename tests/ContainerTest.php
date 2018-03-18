@@ -44,6 +44,15 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 
         $s = $test->make('b');
         $this->assertEquals($s->lol(),1);
+
+        $test->registerAlias('x',al::class);
+        $test->registerAlias('q',la::class);
+
+        $s = $test->make('x');
+        $this->assertEquals($s->g(),'g');
+
+        $s = $test->make('q');
+        $this->assertEquals($s->g(),'ga');
      }
 }
 
@@ -64,3 +73,17 @@ class b
     }
 }
 
+class al
+{
+    public function g()
+    {
+        return 'g';
+    }
+}
+class la
+{
+    public function g()
+    {
+        return 'ga';
+    }
+}

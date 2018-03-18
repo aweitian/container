@@ -18,6 +18,8 @@ class Container
     public $bindings = array();
     //单例服务
     public $instances = array();
+    //alias
+    public $alias = array();
 
     /**
      * 服务绑定到容器
@@ -46,6 +48,18 @@ class Container
     {
         $this->msg = '';
         $this->hasError = false;
+    }
+
+    public function setAlias(array $alias)
+    {
+        $this->alias = $alias;
+        return $this;
+    }
+
+    public function registerAlias($key, $class)
+    {
+        $this->alias[$key] = $class;
+        return $this;
     }
 
     /**
@@ -107,7 +121,7 @@ class Container
      *
      * @return mixed
      */
-    private function getClosure($name)
+    protected function getClosure($name)
     {
         return isset($this->bindings[$name]) ? $this->bindings[$name]['closure'] : $name;
     }
@@ -163,6 +177,10 @@ class Container
             return $this->callFunction($className);
         }
 
+        $alias = $className;
+        if (array_key_exists($alias, $this->alias)) {
+            $className = $this->alias[$alias];
+        }
         //获取类信息
         $reflector = new ReflectionClass($className);
         // 检查类是否可实例化, 排除抽象类abstract和对象接口interface
@@ -218,7 +236,6 @@ class Container
                 $dependencies[] = $this->make($dependency->name);
             }
         }
-
         return $dependencies;
     }
 
